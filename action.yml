@@ -1,0 +1,13 @@
+name: 'Check changelog comments'
+description: 'Automatically check changelog comments'
+inputs:
+  filename:
+    description: 'File name'
+    required: true
+    default: ''
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.filename }}
