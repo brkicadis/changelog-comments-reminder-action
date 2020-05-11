@@ -6,7 +6,6 @@ import re
 
 
 class Definition:
-    # CONFIG_FILE_PATH = '/Users/adis.brkic/Desktop/woocommerce-ee/CHANGELOG.md'
     CONFIG_FILE_PATH = 'CHANGELOG.md'
     SHOP_EXTENSION_PARTNER = 'brkicadis'
 
@@ -20,8 +19,6 @@ class ReleaseVersion:
         """
         repository_name = sys.argv[1]
         repository_to_clone = Definition.SHOP_EXTENSION_PARTNER + "/" + repository_name
-        print("Latest: ")
-        print(lastversion.latest(repository_to_clone, output_format='version', pre_ok=True))
         return str(lastversion.latest(repository_to_clone, output_format='version', pre_ok=True))
 
     @staticmethod
@@ -33,8 +30,6 @@ class ReleaseVersion:
         repo = git.Repo(search_parent_directories=True)
         branch = repo.active_branch
         current_release_version = re.sub('[^\d\.]', '', branch.name)
-        print("Current: ")
-        print(current_release_version)
         return current_release_version
 
 
@@ -58,17 +53,20 @@ class ChangelogReleaseNotes:
                 is_found = True
 
         if is_found == False:
-            print('Release notes for the latest release candidate do not exists!', file=sys.stderr)
+            print('Current release tag does not exists!', file=sys.stderr)
             sys.exit(1)
 
         return release_notes
 
     @staticmethod
     def validate_release_notes():
-        print(ChangelogReleaseNotes.get_release_notes())
         current_release_notes, last_release_notes, *_ = ChangelogReleaseNotes.get_release_notes().values()
+        if current_release_notes == '':
+            print('Current release tag exists but the release notes are not added!', file=sys.stderr)
+            sys.exit(1)
+
         if current_release_notes == last_release_notes:
-            print('Release notes are not updated!', file=sys.stderr)
+            print('Current release tag exists but the release notes are the same as for the previous release!', file=sys.stderr)
             sys.exit(1)
 
 
