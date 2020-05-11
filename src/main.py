@@ -61,8 +61,8 @@ class ChangelogReleaseNotes:
     @staticmethod
     def validate_release_notes():
         current_release_notes, last_release_notes, *_ = ChangelogReleaseNotes.get_release_notes().values()
-        if current_release_notes == '':
-            print('Current release tag exists but the release notes are not added!', file=sys.stderr)
+        if current_release_notes == '' or not current_release_notes.startswith('*'):
+            print('Current release tag exists but the release notes are not added or in wrong format!', file=sys.stderr)
             sys.exit(1)
 
         if current_release_notes == last_release_notes:
