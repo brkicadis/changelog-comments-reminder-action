@@ -11,7 +11,7 @@ import re
 class Definition:
     # CONFIG_FILE_PATH = '/Users/adis.brkic/Desktop/woocommerce-ee/CHANGELOG.md'
     CONFIG_FILE_PATH = 'CHANGELOG.md'
-    SHOP_EXTENSION_PARTNER = 'wirecard'
+    SHOP_EXTENSION_PARTNER = 'brkicadis'
 
 
 class ReleaseVersion:
@@ -28,10 +28,9 @@ class ReleaseVersion:
         """
         repository_name = sys.argv[1]
         repository_to_clone = Definition.SHOP_EXTENSION_PARTNER + "/" + repository_name
-        latest_release_vrsion = str(lastversion.latest(repository_to_clone, output_format='version', pre_ok=True))
         print("Latest: ")
-        print(latest_release_vrsion)
-        return latest_release_vrsion
+        print(lastversion.latest(repository_to_clone, output_format='version', pre_ok=True))
+        return lastversion.latest(repository_to_clone, output_format='version', pre_ok=True)
 
     @staticmethod
     def get_current_release_version() -> str:
