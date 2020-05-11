@@ -6,24 +6,12 @@ import argparse
 import sys
 import git
 import re
-from itertools import islice
 
 
 class Definition:
     # CONFIG_FILE_PATH = '/Users/adis.brkic/Desktop/woocommerce-ee/CHANGELOG.md'
     CONFIG_FILE_PATH = 'CHANGELOG.md'
     SHOP_EXTENSION_PARTNER = 'wirecard'
-
-    EXTENSION_NAMING_CONVENTION = {
-        "paymentSDK-php": "paymentsdk",
-        "prestashop-ee": "prestashop",
-        "woocommerce-ee": "woocommerce",
-        "opencart-ee": "opencart",
-        "magento2-ee": "magento2",
-        "shopware-ee": "shopware",
-        "oxid-ee": "oxid",
-        "magento-ee": "magento"
-    }
 
 
 class ReleaseVersion:
@@ -59,7 +47,7 @@ class ReleaseVersion:
 
 class ChangelogReleaseNotes:
     @staticmethod
-    def get_release_notes():
+    def get_release_notes() -> dict:
         """
         Returns release notes from changelog file for a specific version
         :return: dict
@@ -98,5 +86,5 @@ if __name__ == "__main__":
     extension_name = args.repository
     last_release = ReleaseVersion.get_last_released_version()
     current_release = ReleaseVersion.get_current_release_version()
-    # release_notes_checker = ChangelogReleaseNotes
-    # release_notes_checker.validate_release_notes()
+    release_notes_checker = ChangelogReleaseNotes
+    release_notes_checker.validate_release_notes()
