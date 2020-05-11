@@ -6,10 +6,11 @@ import argparse
 import sys
 import git
 import re
+from itertools import islice
 
 
 class Definition:
-    CONFIG_FILE_PATH = '/usr/bin/shop-extensions.json'
+    CONFIG_FILE_PATH = '/Users/adis.brkic/Desktop/woocommerce-ee/CHANGELOG.md'
     SHOP_EXTENSION_PARTNER = 'wirecard'
 
     EXTENSION_NAMING_CONVENTION = {
@@ -22,23 +23,6 @@ class Definition:
         "oxid-ee": "oxid",
         "magento-ee": "magento"
     }
-
-
-class JsonFile:
-    def __init__(self, json_file_name):
-        self.json_file_name = json_file_name
-
-    def get_json_file(self) -> dict:
-        with open(os.path.abspath(self.json_file_name)) as file_name:
-            return json.load(file_name)
-
-    @staticmethod
-    def json_decoder(extensions_parameters) -> tuple:
-        return namedtuple('X', extensions_parameters.keys())(*extensions_parameters.values())
-
-    def get_json_content(self) -> str:
-        json_string = json.dumps(self.get_json_file(), indent=4)
-        return json.loads(json_string, object_hook=JsonFile.json_decoder)
 
 
 class ReleaseVersion:
@@ -55,9 +39,7 @@ class ReleaseVersion:
         """
         repository_name = sys.argv[1]
         repository_to_clone = Definition.SHOP_EXTENSION_PARTNER + "/" + repository_name
-        latest_release_vrsion = 'v' + lastversion.latest(repository_to_clone, output_format='version', pre_ok=True)
-        print('Latest release version')
-        print(latest_release_vrsion)
+        latest_release_vrsion = 'v' + str(lastversion.latest(repository_to_clone, output_format='version', pre_ok=True))
         return latest_release_vrsion
 
     @staticmethod
@@ -69,9 +51,40 @@ class ReleaseVersion:
         repo = git.Repo(search_parent_directories=True)
         branch = repo.active_branch
         current_release_version = 'v' + re.sub('[^\d\.]', '', branch.name)
-        print('Current release version')
-        print(current_release_version)
         return current_release_version
+
+
+class ChangelogReleaseNotes:
+    @staticmethod
+    def get_release_notes():
+        """
+        Returns release notes from changelog file for a specific version
+        :return: dict
+        """
+        release_notes = {}
+        file_name = open(Definition.CONFIG_FILE_PATH, 'r')
+        lines = file_name.readlines()
+        is_found = False
+        for index, line in enumerate(lines):
+            if ReleaseVersion.get_last_released_version() in line:
+                release_notes[ReleaseVersion.get_last_released_version()] = lines[index + 2].strip()
+
+            if ReleaseVersion.get_current_release_version() in line:
+                release_notes[ReleaseVersion.get_current_release_version()] = lines[index + 2].strip()
+                is_found = True
+
+        if is_found == False:
+            print('Release notes for the latest release candidate do not exists!', file=sys.stderr)
+            sys.exit(1)
+
+        return release_notes
+
+    @staticmethod
+    def validate_release_notes():
+        current_release_notes, last_release_notes, *_ = ChangelogReleaseNotes.get_release_notes().values()
+        if current_release_notes == last_release_notes:
+            print('Release notes are not updated!', file=sys.stderr)
+            sys.exit(1)
 
 
 if __name__ == "__main__":
@@ -79,3 +92,5 @@ if __name__ == "__main__":
     parser.add_argument('repository', metavar='extension name', type=str, help='shop extension name e.g. woocommerce-ee')
     args = parser.parse_args()
     extension_name = args.repository
+    release_notes_checker = ChangelogReleaseNotes
+    release_notes_checker.validate_release_notes()
