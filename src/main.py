@@ -77,7 +77,5 @@ if __name__ == "__main__":
     parser.add_argument('repository', metavar='extension name', type=str, help='shop extension name e.g. woocommerce-ee')
     args = parser.parse_args()
     extension_name = args.repository
-    last_release = ReleaseVersion.get_last_released_version()
-    current_release = ReleaseVersion.get_current_release_version()
     release_notes_checker = ChangelogReleaseNotes
     release_notes_checker.validate_release_notes()
