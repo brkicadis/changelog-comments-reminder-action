@@ -29,6 +29,7 @@ class ReleaseVersion:
         repository_name = sys.argv[1]
         repository_to_clone = Definition.SHOP_EXTENSION_PARTNER + "/" + repository_name
         latest_release_vrsion = str(lastversion.latest(repository_to_clone, output_format='version', pre_ok=True))
+        print("Latest: ")
         print(latest_release_vrsion)
         return latest_release_vrsion
 
@@ -41,6 +42,7 @@ class ReleaseVersion:
         repo = git.Repo(search_parent_directories=True)
         branch = repo.active_branch
         current_release_version = re.sub('[^\d\.]', '', branch.name)
+        print("Current: ")
         print(current_release_version)
         return current_release_version
 
