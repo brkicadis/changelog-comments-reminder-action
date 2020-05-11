@@ -10,7 +10,8 @@ from itertools import islice
 
 
 class Definition:
-    CONFIG_FILE_PATH = '/Users/adis.brkic/Desktop/woocommerce-ee/CHANGELOG.md'
+    # CONFIG_FILE_PATH = '/Users/adis.brkic/Desktop/woocommerce-ee/CHANGELOG.md'
+    CONFIG_FILE_PATH = 'CHANGELOG.md'
     SHOP_EXTENSION_PARTNER = 'wirecard'
 
     EXTENSION_NAMING_CONVENTION = {
