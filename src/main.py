@@ -40,7 +40,8 @@ class ReleaseVersion:
         """
         repository_name = sys.argv[1]
         repository_to_clone = Definition.SHOP_EXTENSION_PARTNER + "/" + repository_name
-        latest_release_vrsion = lastversion.latest(repository_to_clone, output_format='version', pre_ok=True)
+        latest_release_vrsion = str(lastversion.latest(repository_to_clone, output_format='version', pre_ok=True))
+        print(latest_release_vrsion)
         return latest_release_vrsion
 
     @staticmethod
@@ -52,6 +53,7 @@ class ReleaseVersion:
         repo = git.Repo(search_parent_directories=True)
         branch = repo.active_branch
         current_release_version = re.sub('[^\d\.]', '', branch.name)
+        print(current_release_version)
         return current_release_version
 
 
@@ -94,5 +96,7 @@ if __name__ == "__main__":
     parser.add_argument('repository', metavar='extension name', type=str, help='shop extension name e.g. woocommerce-ee')
     args = parser.parse_args()
     extension_name = args.repository
-    release_notes_checker = ChangelogReleaseNotes
-    release_notes_checker.validate_release_notes()
+    last_release = ReleaseVersion.get_last_released_version()
+    current_release = ReleaseVersion.get_current_release_version()
+    # release_notes_checker = ChangelogReleaseNotes
+    # release_notes_checker.validate_release_notes()
