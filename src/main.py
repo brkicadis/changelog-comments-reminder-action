@@ -1,7 +1,4 @@
 from lastversion import lastversion
-from collections import namedtuple
-import os
-import json
 import argparse
 import sys
 import git
@@ -15,11 +12,6 @@ class Definition:
 
 
 class ReleaseVersion:
-    def __init__(self, file_name, file_content, version):
-        self.file_name = file_name
-        self.file_content = file_content
-        self.version = version
-
     @staticmethod
     def get_last_released_version() -> str:
         """
@@ -30,7 +22,7 @@ class ReleaseVersion:
         repository_to_clone = Definition.SHOP_EXTENSION_PARTNER + "/" + repository_name
         print("Latest: ")
         print(lastversion.latest(repository_to_clone, output_format='version', pre_ok=True))
-        return lastversion.latest(repository_to_clone, output_format='version', pre_ok=True)
+        return str(lastversion.latest(repository_to_clone, output_format='version', pre_ok=True))
 
     @staticmethod
     def get_current_release_version() -> str:
