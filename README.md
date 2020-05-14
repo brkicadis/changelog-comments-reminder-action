@@ -1,39 +1,16 @@
 # Container Action Template
 
-Changes the versions according to the configuration file (shop-extension.json) in the calling repository.  
-This can be used in an automated release workflow to change release version, as seen [here](https://github.com/wirecard/woocommerce-ee/blob/master/.github/workflows/change-release-version.yml)
+Checks if the changelog version has been updated and if release release notes are either added in wrong format or do not exist. 
+This can be used in an automated release workflow to check release notes, as seen [here](https://github.com/wirecard/woocommerce-ee/blob/master/.github/workflows/changelog-comments-reminder.yml)
 
 ## How to setup
 
 Simply add the action to your workflow
 ````
-- name: Change release version
-  uses: wirecard/extension-release-version@master
+- name: Check changelog comments
+  uses: wirecard/changelog-comments-reminder@master
   with:
     repository: <repository-name>
-````
-And adapt ````shop-extension.json```` to your repositories.  
-Below you can find an [example configuration](#example-shop-extensionjson). 
-
-## How to configure
-
-The script takes the full configuration out of the ````shop-extension.json```` since it was created with the purpose 
-to be used in several extension projects.
-
-## Example shop-extension.json
-
-### Mandatory example shop-extension.json
-````json
-{
-  "extensions": {
-    "prestashop": [
-      {
-        "filename": "wirecardpaymentgateway.php",
-        "version": "VERSION"
-      }
-    ]
-  }
-}
 ````
 
 ## Short overview of the file structure
