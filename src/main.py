@@ -3,9 +3,12 @@ import argparse
 import sys
 import git
 import re
+import itertools
+from termcolor import colored
 
 
 class Definition:
+    # CONFIG_FILE_PATH = '/Users/adis.brkic/Desktop/woocommerce-ee/CHANGELOG.md'
     CONFIG_FILE_PATH = 'CHANGELOG.md'
     SHOP_EXTENSION_PARTNER = 'brkicadis'
 
@@ -35,39 +38,78 @@ class ReleaseVersion:
 
 class ChangelogReleaseNotes:
     @staticmethod
-    def get_release_notes() -> dict:
+    def get_current_release_notes() -> list:
         """
-        Returns release notes from changelog file for a specific version
-        :return: dict
+        Returns current release notes from CHANGELOG.md file for a specific release version
+        :return: array
         """
-        release_notes = {}
         file_name = open(Definition.CONFIG_FILE_PATH, 'r')
-        lines = file_name.readlines()
-        is_found = False
-        for index, line in enumerate(lines):
-            if ReleaseVersion.get_last_released_version() in line:
-                release_notes[ReleaseVersion.get_last_released_version()] = lines[index + 2].strip()
+        release_version = ReleaseVersion()
 
-            if ReleaseVersion.get_current_release_version() in line:
-                release_notes[ReleaseVersion.get_current_release_version()] = lines[index + 2].strip()
+        current_release = list(itertools.takewhile(lambda x: '|' not in x, itertools.dropwhile(lambda x: release_version.get_current_release_version() not in x.strip(), file_name)))
+        current_release_notes = list(filter(None, [item.strip() for item in current_release]))[1:]
+
+        return current_release_notes
+
+    @staticmethod
+    def get_last_release_notes() -> list:
+        """
+        Returns last release notes from CHANGELOG.md file for a last released version
+        :return: array
+        """
+        file_name = open(Definition.CONFIG_FILE_PATH, 'r')
+        release_version = ReleaseVersion()
+
+        last_release = list(itertools.takewhile(lambda x: '|' not in x, itertools.dropwhile(lambda x: release_version.get_last_released_version() not in x, file_name)))
+        last_release_notes = list(filter(None, [item.strip() for item in last_release]))[1:]
+
+        return last_release_notes
+
+    @staticmethod
+    def tag_exist():
+        file_name = open(Definition.CONFIG_FILE_PATH, 'r')
+        is_found = False
+        release_version = ReleaseVersion()
+
+        for file_line in file_name:
+            if release_version.get_current_release_version() in file_line:
                 is_found = True
 
         if is_found == False:
-            print('Current release tag does not exists!', file=sys.stderr)
+            print(colored('Current release tag does not exists!', 'red'), file=sys.stderr)
             sys.exit(1)
 
-        return release_notes
+    @staticmethod
+    def release_notes_difference():
+        changelog_release_notes = ChangelogReleaseNotes()
+        if changelog_release_notes.get_current_release_notes() == changelog_release_notes.get_last_release_notes():
+            print(colored('Current release tag exists, but the release notes are the same as for the previous release!!', 'red'), file=sys.stderr)
+            sys.exit(1)
+
+    @staticmethod
+    def release_notes_exist():
+        changelog_release_notes = ChangelogReleaseNotes()
+        if not changelog_release_notes.get_current_release_notes():
+            print(colored('Current release tag exists, but the release notes are the empty!', 'red'), file=sys.stderr)
+            sys.exit(1)
+
+    @staticmethod
+    def release_notes_format():
+        changelog_release_notes = ChangelogReleaseNotes()
+        if not all(release_note.startswith('*') for release_note in changelog_release_notes.get_current_release_notes()):
+            print(colored('Current release tag exists, the release notes exists, but the format is wrong!', 'red'), file=sys.stderr)
+            sys.exit(1)
 
     @staticmethod
     def validate_release_notes():
-        current_release_notes, last_release_notes, *_ = ChangelogReleaseNotes.get_release_notes().values()
-        if current_release_notes == '' or not current_release_notes.startswith('*'):
-            print('Current release tag exists but the release notes are not added or in wrong format!', file=sys.stderr)
-            sys.exit(1)
+        changelog_release_notes = ChangelogReleaseNotes()
 
-        if current_release_notes == last_release_notes:
-            print('Current release tag exists but the release notes are the same as for the previous release!', file=sys.stderr)
-            sys.exit(1)
+        changelog_release_notes.tag_exist()
+        changelog_release_notes.release_notes_difference()
+        changelog_release_notes.release_notes_exist()
+        changelog_release_notes.release_notes_format()
+
+        print(colored('You are good to release!', 'green'))
 
 
 if __name__ == "__main__":
@@ -75,5 +117,5 @@ if __name__ == "__main__":
     parser.add_argument('repository', metavar='extension name', type=str, help='shop extension name e.g. woocommerce-ee')
     args = parser.parse_args()
     extension_name = args.repository
-    release_notes_checker = ChangelogReleaseNotes
-    release_notes_checker.validate_release_notes()
+    changelo_release_notes = ChangelogReleaseNotes()
+    changelo_release_notes.validate_release_notes()
