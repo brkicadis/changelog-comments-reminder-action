@@ -66,7 +66,7 @@ class ChangelogReleaseNotes:
         return last_release_notes
 
     @staticmethod
-    def tag_exist():
+    def validate_tag_exist():
         file_name = open(Definition.CONFIG_FILE_PATH, 'r')
         is_found = False
         release_version = ReleaseVersion()
@@ -76,38 +76,41 @@ class ChangelogReleaseNotes:
                 is_found = True
 
         if is_found == False:
-            print(colored('Current release tag does not exists!', 'red'), file=sys.stderr)
+            print(colored('Release ' + release_version.get_current_release_version() + ' tag does not exists!', 'red'), file=sys.stderr)
             sys.exit(1)
 
     @staticmethod
-    def release_notes_difference():
+    def validate_release_notes_difference():
         changelog_release_notes = ChangelogReleaseNotes()
+        release_version = ReleaseVersion()
         if changelog_release_notes.get_current_release_notes() == changelog_release_notes.get_last_release_notes():
-            print(colored('Current release tag exists, but the release notes are the same as for the previous release!!', 'red'), file=sys.stderr)
+            print(colored('Release ' + release_version.get_current_release_version() + ' tag exists, but the release candidate notes are the same as for the previous release!!', 'red'), file=sys.stderr)
             sys.exit(1)
 
     @staticmethod
-    def release_notes_exist():
+    def validate_release_notes_exist():
         changelog_release_notes = ChangelogReleaseNotes()
+        release_version = ReleaseVersion()
         if not changelog_release_notes.get_current_release_notes():
-            print(colored('Current release tag exists, but the release notes are the empty!', 'red'), file=sys.stderr)
+            print(colored('Release ' + release_version.get_current_release_version() + ' tag exists, but the release candidate notes are the empty!', 'red'), file=sys.stderr)
             sys.exit(1)
 
     @staticmethod
-    def release_notes_format():
+    def validate_release_notes_format():
         changelog_release_notes = ChangelogReleaseNotes()
+        release_version = ReleaseVersion()
         if not all(release_note.startswith('*') for release_note in changelog_release_notes.get_current_release_notes()):
-            print(colored('Current release tag exists, the release notes exists, but the format is wrong!', 'red'), file=sys.stderr)
+            print(colored('Release ' + release_version.get_current_release_version() + ' tag exists, the release candidate notes exists, but the format is wrong!', 'red'), file=sys.stderr)
             sys.exit(1)
 
     @staticmethod
     def validate_release_notes():
         changelog_release_notes = ChangelogReleaseNotes()
 
-        changelog_release_notes.tag_exist()
-        changelog_release_notes.release_notes_difference()
-        changelog_release_notes.release_notes_exist()
-        changelog_release_notes.release_notes_format()
+        changelog_release_notes.validate_tag_exist()
+        changelog_release_notes.validate_release_notes_difference()
+        changelog_release_notes.validate_release_notes_exist()
+        changelog_release_notes.validate_release_notes_format()
 
         print(colored('You are good to release!', 'green'))
 
